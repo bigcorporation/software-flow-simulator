@@ -7,8 +7,9 @@
     "Develop": 20,
     "Test": 16,
     "Rework": 3,
-    "Regression": 2,
+    "ART": 2,
     "Release": 3
   },
-  "num_work_items": 300
+  "num_work_items": 300,
+  "wip_limit": 4
 }

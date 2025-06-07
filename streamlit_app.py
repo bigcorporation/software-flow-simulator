@@ -7,46 +7,81 @@ from visualisation.plotter import plot_simulation_results
 st.set_page_config(page_title="SimPy Dev/Test Simulation", layout="wide")
 
 st.title("Development Simulation")
-st.markdown("This simulation models a software development process where work items flow through development, testing, and release from a backlog. It simulates limited developer and tester resources handling work with pull based priorities and possible rework based on failure chance.")
-st.markdown("The system tracks key performance metrics such as work in progress, resource utilisation, flow efficiency, and queue times.")
+st.markdown("This simulation models a software development process where work items enter from a backlog, flowing through development, testing, test automation, and release. It simulates limited developer and tester resources handling work with pull based priorities and possible rework based on failure chance.")
+st.markdown("The model tracks key performance metrics such as work in progress, resource utilisation, flow efficiency, and wait times.")
+st.markdown("Adjust the configuration, then select Run Simulation")
 
-# --- Sidebar config ---
-st.sidebar.header("Simulation Settings")
 
-# Basic config inputs
-num_developers = st.sidebar.number_input("Number of Developers", min_value=1, value=4)
-num_testers = st.sidebar.number_input("Number of Testers", min_value=1, value=2)
-failure_chance = st.sidebar.slider("Failure Chance", 0.0, 1.0, 0.3, step=0.05)
-num_work_items = st.sidebar.number_input("Number of Work Items", min_value=1, value=300)
+# --- Config inputs in expander ---
+with st.expander("Configuration", expanded=True):
 
-# Stage durations
-st.sidebar.markdown("### Stage Durations (hours)")
+    st.markdown("##### Work Parameters")
+    col3, col4, col5 = st.columns(3)
+
+    with col3:
+        num_work_items = st.number_input("Number of Work Items", min_value=1, value=300)
+
+    with col4:
+        failure_chance = st.number_input("Rework Chance", min_value=0.0, max_value=1.0, step=0.1, value=0.3)
+
+    with col5:
+        wip_limit = st.number_input("WIP Limit", min_value=1, value=8)
+
+    st.markdown("##### Resources")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        num_developers = st.number_input("Number of Developers", min_value=1, value=4)
+        
+    with col2:
+        num_testers = st.number_input("Number of Testers", min_value=1, value=2)
+
+    st.markdown("##### Stage Durations (Hours)")
+    col3, col4, col5 = st.columns(3)
+    with col3:
+        backlog = st.number_input("Backlog", min_value=0, value=0)
+        develop = st.number_input("Develop", min_value=1, value=20)
+    with col4:
+        test = st.number_input("Test", min_value=1, value=8)
+        rework = st.number_input("Rework", min_value=1, value=3)
+    with col5:
+        art = st.number_input("ART", min_value=1, value=2)
+        release = st.number_input("Release", min_value=1, value=3)
+
+# Assemble durations
 durations = {
-    "Backlog": st.sidebar.number_input("Backlog", min_value=0, value=0),
-    "Develop": st.sidebar.number_input("Develop", min_value=1, value=20),
-    "Test": st.sidebar.number_input("Test", min_value=1, value=8),
-    "Rework": st.sidebar.number_input("Rework", min_value=1, value=3),
-    "Regression": st.sidebar.number_input("Regression", min_value=1, value=2),
-    "Release": st.sidebar.number_input("Release", min_value=1, value=3)
+    "Backlog": backlog,
+    "Develop": develop,
+    "Test": test,
+    "Rework": rework,
+    "ART": art,
+    "Release": release
 }
 
-# Bundle config
+# Assemble config
 config = {
     "num_developers": num_developers,
     "num_testers": num_testers,
     "failure_chance": failure_chance,
     "durations": durations,
-    "num_work_items": num_work_items
+    "num_work_items": num_work_items,
+    "wip_limit": wip_limit
 }
 
-# --- Run button ---
-if st.sidebar.button("Run Simulation"):
-    with st.spinner("Running simulation..."):
+# --- Big central run button ---
+st.markdown("<hr>", unsafe_allow_html=True)
+run_clicked = st.button("**Run Simulation**", type="primary")
+
+# --- Run simulation ---
+if run_clicked:
+    with st.spinner("Loading"):
         metrics, config_used, sim_time = run_simulation(config=config)
 
-        st.write(f"Simulation Time: {sim_time:.0f} hours")
-        st.write(f"Items Developed: {metrics.completed_items}")
-
+        st.write(f"**Simulation Time:** {sim_time:.0f} hours")
+        st.write(f"**Items Developed:** {metrics.completed_items}")
 
         fig = plot_simulation_results(metrics, config_used, sim_time)
         st.pyplot(fig)
+        
+
+

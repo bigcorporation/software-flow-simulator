@@ -83,44 +83,35 @@ def plot_simulation_results(metrics, config, simulation_time):
     ]
     ax.legend(handles=util_legend_patches, title='Utilisation Levels')
 
-    # --- Flow Efficiency Histogram ---
+    # --- Flow Efficiency Histogram with Manual Thresholds ---
     ax = axs[2]
     efficiencies = [
         a / l if l > 0 else 0
         for l, a in metrics.item_times
     ]
 
-    num_bins = 4
-    counts, bins, patches = ax.hist(efficiencies, bins=num_bins, edgecolor='black')
+    # Define manual bins based on thresholds
+    bins = [0.0, 0.25, 0.5, 0.75, 1.0]
+    labels = ['Low', 'Medium', 'High', 'Very High']
+    colors = ['red', 'orange', 'green', '#ccffcc']
 
-    cmap = mcolors.LinearSegmentedColormap.from_list("efficiency_gradient", ["red", "orange", "green"])
-    norm = mcolors.Normalize(vmin=0, vmax=num_bins - 1)
+    # Plot histogram
+    counts, bins, patches = ax.hist(efficiencies, bins=bins, edgecolor='black')
 
-    for i, patch in enumerate(patches):
-        patch.set_facecolor(cmap(norm(i)))
+    # Manually set colors based on thresholds
+    for patch, color in zip(patches, colors):
+        patch.set_facecolor(color)
 
+    # Set titles and labels
     ax.set_title('Flow Efficiency Distribution')
     ax.set_xlabel('Efficiency')
     ax.set_ylabel('Work Item Count')
     ax.grid(True, linestyle='--', alpha=0.7)
 
-    # Define your 4 labels for bins
-    labels = ['Very Low', 'Low', 'Medium', 'High']
-
-    # Get colors from your colormap for each bin
-    colors = [cmap(norm(i)) for i in range(num_bins)]
-
-    # Create legend patches
-    legend_patches = [mpatches.Patch(color=colors[i], label=labels[i]) for i in range(num_bins)]
-
-    # Add legend to the same axis as your histogram
+    # Add manual legend
+    legend_patches = [mpatches.Patch(color=colors[i], label=labels[i]) for i in range(len(labels))]
     ax.legend(handles=legend_patches, title='Flow Efficiency', loc='upper right')
 
-    # # Add colorbar for flow efficiency gradient
-    # sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    # sm.set_array([])
-    # cbar = fig.colorbar(sm, ax=ax, orientation='vertical', fraction=0.046, pad=0.04)
-    # cbar.set_label('Bin Index (Efficiency Gradient)')
 
     # --- Average Wait Time per Stage without Backlog ---
     ax = axs[3]
@@ -132,22 +123,14 @@ def plot_simulation_results(metrics, config, simulation_time):
         for s in filtered_stages
     ]
 
-    min_wait = min(filtered_waits) if filtered_waits else 0
-    max_wait = max(filtered_waits) if filtered_waits else 1  # avoid zero range
-
+    # Manual threshold-based coloring
     def wait_color(wait):
-        if max_wait == min_wait:
-            return 'green'
-        
-        threshold1 = min_wait + (max_wait - min_wait) * 0.33
-        threshold2 = min_wait + (max_wait - min_wait) * 0.66
-
-        if wait <= threshold1:
-            return 'green'
-        elif wait <= threshold2:
-            return 'orange'
+        if wait < 4:
+            return 'green'    # Great
+        elif wait <= 8:
+            return 'orange'   # Okay
         else:
-            return 'red'
+            return 'red'      # Bad
 
     colors = [wait_color(w) for w in filtered_waits]
 
@@ -160,13 +143,14 @@ def plot_simulation_results(metrics, config, simulation_time):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.05,
                 f"{wait:.2f}", ha='center', va='bottom', fontsize=9)
 
-    # Add legend for Wait Times
+    # Updated legend to match new threshold meanings
     wait_legend_patches = [
-        mpatches.Patch(color='green', label='Low'),
-        mpatches.Patch(color='orange', label='Moderate'),
-        mpatches.Patch(color='red', label='High')
+        mpatches.Patch(color='green', label='< 4h (Low)'),
+        mpatches.Patch(color='orange', label='4–8h (Moderate)'),
+        mpatches.Patch(color='red', label='> 8h (High)')
     ]
-    ax.legend(handles=wait_legend_patches, title='Wait Time')
+    ax.legend(handles=wait_legend_patches, title='Avg Wait Time')
+
 
     plt.tight_layout()
     return fig

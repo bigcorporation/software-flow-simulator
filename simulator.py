@@ -3,9 +3,10 @@ import random
 from metrics import Metrics
 
 class Team:
-    def __init__(self, env, config):
+    def __init__(self, env, config, sim):
         self.env = env
         self.config = config
+        self.sim = sim
         self.developers = simpy.PriorityResource(env, capacity=config['num_developers'])
         self.testers = simpy.PriorityResource(env, capacity=config['num_testers'])
         self.stage_resources = {
@@ -13,12 +14,12 @@ class Team:
             'Develop': self.developers,
             'Test': self.testers,
             'Rework': self.developers,
-            'Regression': self.developers,
+            'ART': self.developers,
             'Release': self.developers
         }
         self.stage_priorities = {
             'Release': 0,
-            'Regression': 1,
+            'ART': 1,
             'Rework': 2,
             'Test': 3,
             'Develop': 4,
@@ -30,6 +31,7 @@ class WorkItem:
         self.env = env
         self.team = team
         self.config = config
+        
         self.metrics = metrics
         self.active_time = 0
         self.action = env.process(self.run_workflow())
@@ -54,9 +56,12 @@ class WorkItem:
     def run_workflow(self):
         cfg = self.config['durations']
         yield from self.process_stage('Backlog', cfg['Backlog'])
+
+        yield self.team.sim.wip.put(1)  #Wait here if WIP limit is reached
         self.metrics.log_wip(self.env, +1)
         self.entry_time = self.env.now
         
+
         yield from self.process_stage('Develop', cfg['Develop'])
         yield from self.process_stage('Test', cfg['Test'])
 
@@ -64,18 +69,21 @@ class WorkItem:
             yield from self.process_stage('Rework', cfg['Rework'])
             yield from self.process_stage('Test', cfg['Test'])
 
-        yield from self.process_stage('Regression', cfg['Regression'])
+        yield from self.process_stage('ART', cfg['ART'])
         yield from self.process_stage('Release', cfg['Release'])
         self.metrics.log_wip(self.env, -1)
         self.metrics.completed_items += 1
         self.metrics.item_exit(self.entry_time, self.active_time, self.env)
+        yield self.team.sim.wip.get(1)  # Release WIP slot
 
 class Simulator:
     def __init__(self, config):
         self.env = simpy.Environment()
         self.config = config
-        self.team = Team(self.env, config)
+        self.team = Team(self.env, config, sim=self)
         self.metrics = Metrics(self.team)  # You'll need to import Metrics
+        self.wip = simpy.Container(self.env, init=0, capacity=config["wip_limit"])
+
 
     def run_simulator(self):
         for _ in range(self.config['num_work_items']):
