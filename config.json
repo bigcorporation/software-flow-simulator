@@ -1,0 +1,14 @@
+{
+  "num_developers": 18,
+  "num_testers": 12,
+  "failure_chance": 0.3,
+  "durations": {
+    "Backlog": 0,
+    "Develop": 20,
+    "Test": 16,
+    "Rework": 3,
+    "Regression": 2,
+    "Release": 3
+  },
+  "num_work_items": 300
+}
