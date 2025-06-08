@@ -4,9 +4,9 @@ import streamlit as st
 from main_streamlit import run_simulation
 from visualisation.plotter import plot_simulation_results
 
-st.set_page_config(page_title="SimPy Dev/Test Simulation", layout="wide")
+st.set_page_config(page_title="Development Simulator", layout="wide")
 
-st.title("Development Simulation")
+st.title("Development Simulator")
 st.markdown("This simulation models a software development process where work items enter from a backlog, flowing through development, testing, test automation, and release. It simulates limited developer and tester resources handling work with pull based priorities and possible rework based on failure chance.")
 st.markdown("The model tracks key performance metrics such as work in progress, resource utilisation, flow efficiency, and wait times.")
 st.markdown("Adjust the configuration, then select Run Simulation")
