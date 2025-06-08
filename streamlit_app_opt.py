@@ -21,7 +21,7 @@ durations = {
     "Backlog": 0,
     "Develop": 20,
     "Test": 8,
-    "Rework": 3,
+    "Rework": 2,
     "ART": 2,
     "Release": 3,
 }
@@ -116,9 +116,9 @@ if run_opt:
 
         # --- Show Best Config ---
         st.write("**Given**")
-        st.write(f"Developer Cost: ${developer_cost}/hr")
-        st.write(f"Tester Cost: ${tester_cost}/hr")
-        st.write(f"Delivery Deadline: {delivery_weeks} weeks / {delivery_deadline_hours} hours")
+        st.write(f"Developer Cost: ${developer_cost}/hour")
+        st.write(f"Tester Cost: ${tester_cost}/hour")
+        st.write(f"Delivery Deadline: {delivery_weeks} weeks = {delivery_deadline_hours} hours")
 
         st.write("**Optimal Configuration**")
         st.write(f"Developers: {best_config['num_developers']}")
