@@ -1,3 +1,4 @@
 streamlit
 simpy
 matplotlib
+seaborn
