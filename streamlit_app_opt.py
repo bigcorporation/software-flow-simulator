@@ -32,7 +32,7 @@ with st.expander("**Configuration**", expanded=True):
     col1, col2 = st.columns(2)
 
     with col1:
-        num_work_items = st.number_input("Number of Work Items", min_value=1, value=100)
+        num_work_items = st.number_input("Number of Work Items", min_value=1, value=40)
         developer_cost = st.number_input("Developer Hourly Cost ($)", min_value=1, value=150)
 
     with col2:
