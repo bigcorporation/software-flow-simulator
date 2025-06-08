@@ -19,7 +19,7 @@ with st.expander("Configuration", expanded=True):
     col3, col4, col5 = st.columns(3)
 
     with col3:
-        num_work_items = st.number_input("Number of Work Items", min_value=1, value=300)
+        num_work_items = st.number_input("Number of Work Items", min_value=1, value=100)
 
     with col4:
         failure_chance = st.number_input("Rework Chance", min_value=0.0, max_value=1.0, step=0.1, value=0.3)

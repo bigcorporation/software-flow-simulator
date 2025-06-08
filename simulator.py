@@ -14,7 +14,7 @@ class Team:
         self.stage_resources = {
             'Backlog': self.developers,
             'Develop': self.developers,
-            'Test': self.developers,
+            'Test': self.testers,
             'Rework': self.developers,
             'ART': self.developers,
             'Release': self.developers
