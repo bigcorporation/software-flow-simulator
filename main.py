@@ -32,6 +32,7 @@ def main():
     print(f'\n=====Simulation Results=====')
     print(f'\nRun Time: {simulation_time} hours')
     print(f"Completed Items: {sim.metrics.completed_items}")
+    print(f"Total Cost: ${sim.team.cost_tracker.compute_total_cost():,.2f}")
 
     # Plot simulation results
     fig = plotter.plot_simulation_results(sim.metrics, config, sim.env.now)

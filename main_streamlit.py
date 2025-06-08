@@ -28,6 +28,8 @@ def print_results(metrics, config, simulation_time):
     print(f'\n=====Simulation Results=====')
     print(f'\nRun Time: {simulation_time} hours')
     print(f"Completed Items: {metrics.completed_items}")
+    print(f"Total Cost: ${metrics.cost_tracker.compute_total_cost():,.2f}")
+
 
 def main():
     metrics, config, simulation_time = run_simulation()

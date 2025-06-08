@@ -1,14 +1,17 @@
 from .queue_tracker import QueueTracker
 from .wip_tracker import WIPTracker
+from .cost_tracker import CostTracker
 
 class Metrics:
     def __init__(self, team):
         self.team = team
         stages = list(team.stage_resources.keys())
 
-        # Delegate queue and wip tracking to these helpers
+        # Delegate queue, wip tracking, and cost tracking to these helpers
         self.queue_tracker = QueueTracker(stages)
         self.wip_tracker = WIPTracker()
+        self.cost_tracker = CostTracker(team.config)
+
 
         # Additional metrics storage
         self.utilisation = {'Developers_busy_time': 0.0, 'Testers_busy_time': 0.0}

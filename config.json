@@ -11,5 +11,9 @@
     "Release": 3
   },
   "num_work_items": 300,
-  "wip_limit": 4
+  "wip_limit": 4,
+  "costs": {
+    "developers": 150,
+    "testers": 120
+  }
 }

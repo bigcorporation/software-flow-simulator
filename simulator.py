@@ -1,18 +1,20 @@
 import simpy
 import random
 from metrics import Metrics
+from metrics.cost_tracker import CostTracker
 
 class Team:
     def __init__(self, env, config, sim):
         self.env = env
         self.config = config
         self.sim = sim
+        self.cost_tracker = CostTracker(config)
         self.developers = simpy.PriorityResource(env, capacity=config['num_developers'])
         self.testers = simpy.PriorityResource(env, capacity=config['num_testers'])
         self.stage_resources = {
             'Backlog': self.developers,
             'Develop': self.developers,
-            'Test': self.testers,
+            'Test': self.developers,
             'Rework': self.developers,
             'ART': self.developers,
             'Release': self.developers
@@ -81,7 +83,10 @@ class Simulator:
         self.env = simpy.Environment()
         self.config = config
         self.team = Team(self.env, config, sim=self)
-        self.metrics = Metrics(self.team)  # You'll need to import Metrics
+        self.metrics = Metrics(self.team)
+        self.cost_tracker = CostTracker(config)
+
+        self.metrics.cost_tracker = self.cost_tracker
         self.wip = simpy.Container(self.env, init=0, capacity=config["wip_limit"])
 
 
@@ -89,3 +94,5 @@ class Simulator:
         for _ in range(self.config['num_work_items']):
             WorkItem(self.env, self.team, self.config, self.metrics)
         self.env.run()
+        total_time = self.env.now
+        self.metrics.cost_tracker.set_simulation_time(total_time)

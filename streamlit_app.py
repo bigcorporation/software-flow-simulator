@@ -32,9 +32,12 @@ with st.expander("Configuration", expanded=True):
 
     with col1:
         num_developers = st.number_input("Number of Developers", min_value=1, value=4)
-        
-    with col2:
         num_testers = st.number_input("Number of Testers", min_value=1, value=2)
+
+    with col2:
+        developer_cost = st.number_input("Developer Hourly Cost ($)", min_value=1, value=150)
+        
+        tester_cost = st.number_input("Tester Hourly Cost ($)", min_value=1, value=120)
 
     st.markdown("##### Stage Durations (Hours)")
     col3, col4, col5 = st.columns(3)
@@ -58,14 +61,18 @@ durations = {
     "Release": release
 }
 
-# Assemble config
+# Assemble config with dynamic costs
 config = {
     "num_developers": num_developers,
     "num_testers": num_testers,
     "failure_chance": failure_chance,
     "durations": durations,
     "num_work_items": num_work_items,
-    "wip_limit": wip_limit
+    "wip_limit": wip_limit,
+    "costs": {
+        "developers": developer_cost,
+        "testers": tester_cost
+    }
 }
 
 # --- Big central run button ---
@@ -79,6 +86,7 @@ if run_clicked:
 
         st.write(f"**Simulation Time:** {sim_time:.0f} hours")
         st.write(f"**Items Developed:** {metrics.completed_items}")
+        st.write(f"**Total Cost**: ${metrics.cost_tracker.compute_total_cost():,.2f}")
 
         fig = plot_simulation_results(metrics, config_used, sim_time)
         st.pyplot(fig)
