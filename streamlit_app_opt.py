@@ -5,6 +5,7 @@ from visualisation.plotter import plot_simulation_results
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 st.set_page_config(page_title="Development Sim Optimiser", layout="wide")
 
@@ -27,20 +28,30 @@ durations = {
 }
 
 # --- Configurable inputs ---
-st.markdown("### Configuration")
-num_work_items = st.number_input("Number of Work Items", min_value=1, value=100)
-developer_cost = st.number_input("Developer Hourly Cost ($)", min_value=1, value=150)
-tester_cost = st.number_input("Tester Hourly Cost ($)", min_value=1, value=120)
-delivery_weeks = st.number_input("Delivery Deadline (weeks)", min_value=1, value=12)
+with st.expander("**Configuration**", expanded=True):
+    col1, col2 = st.columns(2)
 
-# Convert weeks to hours (5 days per week, 8 hours per day)
-delivery_deadline_hours = delivery_weeks * 5 * 8
+    with col1:
+        num_work_items = st.number_input("Number of Work Items", min_value=1, value=100)
+        developer_cost = st.number_input("Developer Hourly Cost ($)", min_value=1, value=150)
 
-# --- Grid search ranges ---
-st.markdown("### Grid Search Ranges")
-dev_min, dev_max = st.slider("Developers", 1, 8, (1, 8))
-tester_min, tester_max = st.slider("Testers", 1, 8, (1, 8))
-wip_min, wip_max = st.slider("WIP Limit", 1, 20, (1, 20))
+    with col2:
+        delivery_weeks = st.number_input("Delivery Deadline (weeks)", min_value=1, value=12)
+        tester_cost = st.number_input("Tester Hourly Cost ($)", min_value=1, value=120)
+
+    # Convert weeks to hours (5 days per week, 8 hours per day)
+    delivery_deadline_hours = delivery_weeks * 5 * 8
+
+    st.markdown("**Grid Search Ranges**")
+    col3, col4 = st.columns(2)
+
+    with col3:
+        dev_min, dev_max = st.slider("Developers", 1, 8, (1, 8))
+        wip_min, wip_max = st.slider("WIP Limit", 1, 20, (1, 20))
+
+    with col4:
+        tester_min, tester_max = st.slider("Testers", 1, 8, (1, 8))
+
 
 st.markdown("---")
 
@@ -114,26 +125,51 @@ if run_opt:
         if skipped_configs > 0:
             st.info(f"{skipped_configs} configurations skipped for exceeding the delivery deadline of {delivery_weeks} weeks.")
 
-        # --- Show Best Config ---
+# --- Show Best Config in three columns ---
+
         st.write("**Given**")
         st.write(f"Developer Cost: ${developer_cost}/hour")
         st.write(f"Tester Cost: ${tester_cost}/hour")
-        st.write(f"Delivery Deadline: {delivery_weeks} weeks = {delivery_deadline_hours} hours")
+        st.write(f"Delivery Deadline: {delivery_weeks} weeks ({delivery_deadline_hours} hours)")
 
-        st.write("**Optimal Configuration**")
-        st.write(f"Developers: {best_config['num_developers']}")
-        st.write(f"Testers: {best_config['num_testers']}")
-        st.write(f"WIP Limit: {best_config['wip_limit']}")
+        st.markdown("---")
+        col1, col2 = st.columns(2)
 
-        st.markdown("**Metrics**")
-        st.write(f"Simulation Time: {best_sim_time:.0f} hours")
-        st.write(f"Total Cost: ${int(best_metrics.cost_tracker.compute_total_cost()):,}")
-        st.write(f"Items Developed: {best_metrics.completed_items}")
+        with col1:
+            st.write("**Optimal Configuration**")
+            st.write(f"Developers: {best_config['num_developers']}")
+            st.write(f"Testers: {best_config['num_testers']}")
+            st.write(f"WIP Limit: {best_config['wip_limit']}")
+
+        with col2:
+            st.markdown("**Results**")
+            st.write(f"Simulation Time: {best_sim_time:.0f} hours")
+            st.write(f"Total Cost: ${int(best_metrics.cost_tracker.compute_total_cost()):,}")
+            st.write(f"Items Developed: {best_metrics.completed_items}")
 
         # --- Plot Results ---
         fig = plot_simulation_results(best_metrics, best_config, best_sim_time)
         st.pyplot(fig)
 
+        df_results = pd.DataFrame(results_table)
+        if not df_results.empty:
+            fig_parallel = px.parallel_coordinates(
+                df_results,
+                dimensions=["Developers", "Testers", "WIP Limit", "Time (hrs)", "Avg Completed", "Avg Cost", "Cost per Item"],
+                color="Cost per Item",
+                color_continuous_scale=px.colors.diverging.RdYlGn[::-1],
+                labels={
+                    "Developers": "Dev",
+                    "Testers": "Test",
+                    "WIP Limit": "WIP",
+                    "Time (hrs)": "Time",
+                    "Avg Completed": "Done",
+                    "Avg Cost": "Total $",
+                    "Cost per Item": "$/Item"
+                },
+                title="Configuration Space Overview"
+            )
+            st.plotly_chart(fig_parallel, use_container_width=True)
         # # --- Table of all results ---
         # st.markdown("**All Evaluated Configurations**")
         # results_table_sorted = sorted(results_table, key=lambda x: x["Cost per Item"])
