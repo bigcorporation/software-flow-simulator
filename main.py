@@ -5,8 +5,6 @@ from visualisation import plotter
 from simulator import Simulator
 import matplotlib.pyplot as plt
 
-
-
 def main():
     # Load config
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -33,6 +31,7 @@ def main():
     print(f'\nRun Time: {simulation_time} hours')
     print(f"Completed Items: {sim.metrics.completed_items}")
     print(f"Total Cost: ${sim.team.cost_tracker.compute_total_cost():,.2f}")
+
 
     # Plot simulation results
     fig = plotter.plot_simulation_results(sim.metrics, config, sim.env.now)

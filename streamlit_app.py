@@ -16,16 +16,18 @@ st.markdown("Adjust the configuration, then select Run Simulation")
 with st.expander("Configuration", expanded=True):
 
     st.markdown("##### Work Parameters")
-    col3, col4, col5 = st.columns(3)
+    col3, col4 = st.columns(2)
 
     with col3:
         num_work_items = st.number_input("Number of Work Items", min_value=1, value=100)
+        smoke_test_failure_chance = st.number_input("Smoke Test Rework Chance", min_value=0.0, max_value=1.0, step=0.1, value=0.3)
 
     with col4:
-        failure_chance = st.number_input("Rework Chance", min_value=0.0, max_value=1.0, step=0.1, value=0.3)
-
-    with col5:
         wip_limit = st.number_input("WIP Limit", min_value=1, value=8)
+        test_failure_chance = st.number_input("Test Rework Chance", min_value=0.0, max_value=1.0, step=0.1, value=0.3)
+        
+
+        
 
     st.markdown("##### Resources")
     col1, col2 = st.columns(2)
@@ -33,28 +35,33 @@ with st.expander("Configuration", expanded=True):
     with col1:
         num_developers = st.number_input("Number of Developers", min_value=1, value=4)
         num_testers = st.number_input("Number of Testers", min_value=1, value=2)
+        num_business_analysts = st.number_input("Number of Business Analysts", min_value=1,value =2)
 
     with col2:
         developer_cost = st.number_input("Developer Hourly Cost ($)", min_value=1, value=150)
-        
         tester_cost = st.number_input("Tester Hourly Cost ($)", min_value=1, value=120)
+        business_analyst_cost = st.number_input("Business Analyst Hourly Cost ($)", min_value=1, value=150)
+
 
     st.markdown("##### Stage Durations (Hours)")
-    col3, col4, col5 = st.columns(3)
+    col3, col4 = st.columns(2)
     with col3:
         backlog = st.number_input("Backlog", min_value=0, value=0)
         develop = st.number_input("Develop", min_value=1, value=20)
-    with col4:
+        smoke_test = st.number_input("Smoke_Test", min_value=1, value=2)
         test = st.number_input("Test", min_value=1, value=8)
+    with col4:
         rework = st.number_input("Rework", min_value=1, value=3)
-    with col5:
         art = st.number_input("ART", min_value=1, value=2)
         release = st.number_input("Release", min_value=1, value=3)
+        
+        
 
 # Assemble durations
 durations = {
     "Backlog": backlog,
     "Develop": develop,
+    "Smoke_Test": smoke_test,
     "Test": test,
     "Rework": rework,
     "ART": art,
@@ -65,13 +72,16 @@ durations = {
 config = {
     "num_developers": num_developers,
     "num_testers": num_testers,
-    "failure_chance": failure_chance,
+    "num_business_analysts": num_business_analysts,
+    "test_failure_chance": test_failure_chance,
+    "smoke_test_failure_chance": smoke_test_failure_chance,
     "durations": durations,
     "num_work_items": num_work_items,
     "wip_limit": wip_limit,
     "costs": {
         "developers": developer_cost,
-        "testers": tester_cost
+        "testers": tester_cost,
+        "business_analysts": business_analyst_cost
     }
 }
 

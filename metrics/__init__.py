@@ -14,7 +14,7 @@ class Metrics:
 
 
         # Additional metrics storage
-        self.utilisation = {'Developers_busy_time': 0.0, 'Testers_busy_time': 0.0}
+        self.utilisation = {'Developers_busy_time': 0.0, 'Testers_busy_time': 0.0, 'Business_Analysts_busy_time': 0.0}
         self.completed_items = 0
 
         # Flow efficiency tracking
@@ -43,6 +43,8 @@ class Metrics:
         busy_time = end_time - start_time
         if resource == self.team.developers:
             self.utilisation['Developers_busy_time'] += busy_time
+        elif resource == self.team.business_analysts:
+            self.utilisation['Business_Analysts_busy_time'] += busy_time
         elif resource == self.team.testers:
             self.utilisation['Testers_busy_time'] += busy_time
 

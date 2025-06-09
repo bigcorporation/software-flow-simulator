@@ -6,7 +6,7 @@ def plot_simulation_results(metrics, config, simulation_time):
     # Access wait_times through the queue_tracker
     stages = list(metrics.queue_tracker.wait_times.keys())
     
-    fig, axs = plt.subplots(2, 2, figsize=(14, 10))
+    fig, axs = plt.subplots(2, 2, figsize=(14, 10), facecolor = 'none')
     axs = axs.flatten()
 
     # --- WIP Over Time Plot ---
@@ -53,8 +53,9 @@ def plot_simulation_results(metrics, config, simulation_time):
     ax = axs[1]
     dev_util = metrics.utilisation['Developers_busy_time'] / (config['num_developers'] * simulation_time)
     test_util = metrics.utilisation['Testers_busy_time'] / (config['num_testers'] * simulation_time)
-    resources = ['Developers', 'Testers']
-    utilisation = [dev_util, test_util]
+    business_analyst_util = metrics.utilisation['Business_Analysts_busy_time'] / (config['num_business_analysts'] * simulation_time)
+    resources = ['Developers', 'Testers', 'Business Analysts']
+    utilisation = [dev_util, test_util, business_analyst_util]
 
     def util_color(util):
         if util <= 0.80:
@@ -153,4 +154,7 @@ def plot_simulation_results(metrics, config, simulation_time):
 
 
     plt.tight_layout()
+    fig.patch.set_alpha(0.0)  # Transparent figure background
+    for ax in axs:
+        ax.set_facecolor('none')  # Transparent axes background
     return fig

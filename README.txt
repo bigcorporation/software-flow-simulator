@@ -2,7 +2,7 @@
 Development Flow Simulation & Optimiser
 ======================================
 
-This project simulates a software delivery pipeline to evaluate how different team configurations (developers, testers)
+This project simulates a software delivery pipeline to evaluate how different team configurations (developers, business analysts, testers)
 and WIP limits impact delivery performance and cost. There are two Streamlit apps to provide a visual interface. The Explorer app allows users to trial different configurations and view results. The Optimiser allows users to configure a project and its deadline, then optimise to minimise cost, varying resources and WIP limits.
 
 Purpose
@@ -18,13 +18,13 @@ How It Works
 The simulation models the flow of work items through a multi-stage software development process:
 
 1. Stages:
-   - Backlog → Develop → Test → Rework → ART → Release
+   - Backlog → Develop → Smoke Test → Test → ART → Release
 2. Resources:
-   - Developers and testers are assigned to relevant stages.
+   - Developers, business analysts, and testers are assigned to relevant stages.
 3. Work Items:
    - Items are processed sequentially through the stages.
    - Each stage has configurable duration and resource constraints.
-   - Failures can occur (e.g., 30% chance), sending items to Rework.
+   - Failures can occur in smoke testing and testing (e.g., 30% chance), sending items to Rework.
 
 4. Simulation Engine:
    - Built with SimPy, a discrete-event simulation framework.
@@ -36,11 +36,13 @@ Settings are defined in config.json or adjustable in the Streamlit interface:
 
 - num_developers: Number of developers
 - num_testers: Number of testers
+- num_business_analysts: Number of business analysts
 - wip_limit: Max number of items in progress at once
 - durations: Stage durations in hours
 - num_work_items: Total items to simulate
-- failure_chance: Likelihood of failure triggering rework
-- developer_cost, tester_cost: Hourly rates
+- smoke_test_failure_chance: Likelihood of failure during smoke testing triggering rework
+- test_failure_chance: Likelihood of failure during testing triggering rework
+- developer_cost, tester_cost, business_analyst_cost: Hourly rates
 - delivery_weeks: Delivery deadline converted to hours
 
 Outputs

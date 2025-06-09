@@ -11,9 +11,11 @@ class Team:
         self.cost_tracker = CostTracker(config)
         self.developers = simpy.PriorityResource(env, capacity=config['num_developers'])
         self.testers = simpy.PriorityResource(env, capacity=config['num_testers'])
+        self.business_analysts = simpy.PriorityResource(env, capacity=config['num_business_analysts'])
         self.stage_resources = {
             'Backlog': self.developers,
             'Develop': self.developers,
+            'Smoke_Test': self.business_analysts,
             'Test': self.testers,
             'Rework': self.developers,
             'ART': self.developers,
@@ -24,8 +26,9 @@ class Team:
             'ART': 1,
             'Rework': 2,
             'Test': 3,
-            'Develop': 4,
-            'Backlog': 5
+            'Smoke_Test': 4,
+            'Develop': 5,
+            'Backlog': 6
         }
 
 class WorkItem:
@@ -65,9 +68,15 @@ class WorkItem:
         
 
         yield from self.process_stage('Develop', cfg['Develop'])
+        yield from self.process_stage('Smoke_Test', cfg['Smoke_Test'])
+
+        if random.random() < self.config['smoke_test_failure_chance']:
+            yield from self.process_stage('Rework', cfg['Rework'])
+            yield from self.process_stage('Smoke_Test', cfg['Smoke_Test'])
+
         yield from self.process_stage('Test', cfg['Test'])
 
-        if random.random() < self.config['failure_chance']:
+        if random.random() < self.config['test_failure_chance']:
             yield from self.process_stage('Rework', cfg['Rework'])
             yield from self.process_stage('Test', cfg['Test'])
 

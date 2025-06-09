@@ -1,19 +1,23 @@
 {
-  "num_developers": 18,
-  "num_testers": 12,
-  "failure_chance": 0.3,
+  "num_developers": 4,
+  "num_testers": 2,
+  "num_business_analysts": 3,
+  "test_failure_chance": 0.3,
+  "smoke_test_failure_chance": 0.4,
   "durations": {
     "Backlog": 0,
     "Develop": 20,
-    "Test": 16,
+    "Smoke_Test": 5,
+    "Test": 8,
     "Rework": 3,
     "ART": 2,
     "Release": 3
   },
-  "num_work_items": 300,
-  "wip_limit": 4,
+  "num_work_items": 100,
+  "wip_limit": 14,
   "costs": {
     "developers": 150,
-    "testers": 120
+    "testers": 120,
+    "business_analysts": 150
   }
 }
